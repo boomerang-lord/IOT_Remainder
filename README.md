@@ -95,7 +95,7 @@ Generate CA Key
 Keep note of the "dummy". We will need to use it later
 
 **openssl req -new -x509 -days 1826 -key ca.key -out ca.crt**
-*
+
 Enter pass phrase for ca.key:
 You are about to be asked to enter information that will be incorporated
 into your certificate request.
@@ -111,7 +111,7 @@ Organization Name (eg, company) [Internet Widgits Pty Ltd]:IOT_Remainder
 Organizational Unit Name (eg, section) []:IOT_Remainder
 Common Name (e.g. server FQDN or YOUR name) []:SARATH
 Email Address []:
-*
+
 IMPORTANT: Not the common name given, in this case Sarath. Make sure it is the same name that we should use for all certificates
 
 Generate Server Key
