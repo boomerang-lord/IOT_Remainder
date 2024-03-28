@@ -220,7 +220,13 @@ Open another command shell and publish the message "alert"
  **mosquitto_pub --cafile ca.crt --cert client.crt --key client.key -d -h xxx.xxx.xxx.xxx -p 8883 -t /test_topic -m "alert d" --insecure**
 
 
+Make sure to copy the CA.crt, Client.key, and Client.crt to the folder from where we run the command
 
+![alt text](sarath_mqtt.png)
+
+Since we have validated the certificate using the above method, we can compile the MQTT example code and run it. Connect a serial terminal and set the baud rate to 15200. The MQTT connection log will be similar to the screenshot shown below.
+
+![alt text](mqtt_code.png)
 
 
 
