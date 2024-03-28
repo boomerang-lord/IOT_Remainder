@@ -143,5 +143,84 @@ Copy this certificate into the Ubuntu Server where MQTT is installed.
    **sudo cp server.key  /etc/mosquitto/certs/**
    **sudo cp ca.crt  /etc/mosquitto/certs/**
 
+Edit below file and make sure that the certificate path matches the location where we copied the certificate
+
+/etc/mosquitto/mosquitto.conf
+
+## Creating Client Certificate
+
+Create client key
+ **2334  openssl genrsa -out client.key 2048**
+Create Client CSR 
+
+ **openssl req -new -out client.csr -key client.key**
+
+* Country Name (2 letter code) [AU]:US
+State or Province Name (full name) [Some-State]:CALIFORNIA
+Locality Name (eg, city) []:MILPITAS
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:IOT_Remainder
+Organizational Unit Name (eg, section) []:IOT_Remainder
+Common Name (e.g. server FQDN or YOUR name) []:SARATH
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []: *
+
+** openssl x509 -req -in client.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out client.crt -days 800 **
+
+Copy CA.crt, Client.crt, and Client.key inside the main folder of the ESP32 project.
+
+Edit CMAKELists.txt as below
+
+*
+#The following five lines of boilerplate have to be in your project's
+#CMakeLists in this exact order for cmake to work correctly
+cmake_minimum_required(VERSION 3.16)
+
+include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+project(wifi_station)
+
+target_add_binary_data(${CMAKE_PROJECT_NAME}.elf "main/client.crt" TEXT)
+target_add_binary_data(${CMAKE_PROJECT_NAME}.elf "main/client.key" TEXT)
+target_add_binary_data(${CMAKE_PROJECT_NAME}.elf "main/ca.crt" TEXT)
+*
+
+Find out the IP address of the UBUNTU server and update below function with correct IP address
+Make sure to make appropriate changes 
+
+*
+static void mqtt_app_start(void)
+{
+  const esp_mqtt_client_config_t mqtt_cfg = {
+    //.broker.address.uri = "mqtts://test.mosquitto.org:8884",
+	.broker.address.uri = "mqtts://xxx.xxx.xxx.xxx:xxxx",
+    .broker.verification.certificate = (const char *)server_cert_pem_start,
+	.broker.verification.skip_cert_common_name_check = 1,
+    .credentials = {
+      .authentication = {
+        .certificate = (const char *)client_cert_pem_start,
+        .key = (const char *)client_key_pem_start,
+      },
+    }
+  };
+  *
+
+## Starting the mosquito broker 
+
+**sudo mosquitto -c /etc/mosquitto/mosquitto.conf**
+
+## Testing the mosquito broker with client certificate
+Open a command shell and type below command.
+ ***mosquitto_sub -C 1   -v  --cafile ca.crt --cert client.crt --key client.key -d -h xxx.xxx.xxx.xxx -p 8883 -t /test_topic  --insecure***
+
+Open another command shell and publish the message "alert"
+
+ **mosquitto_pub --cafile ca.crt --cert client.crt --key client.key -d -h xxx.xxx.xxx.xxx -p 8883 -t /test_topic -m "alert d" --insecure**
+
+
+
+
 
 
