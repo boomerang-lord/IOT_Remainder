@@ -31,7 +31,7 @@ Image testing
 # Design Goals
 1. Secure low coast IoT Module 
 2. Ultra low power operation for years of batery life
-3. Self-Learning Event Pattern inside the device and in th server
+3. Self-Learning Event Pattern inside the device and in the server
 4. Machine Learning based Analysis of the event patterns
 
 # Hardware Design
@@ -59,4 +59,89 @@ After completing the layout , I created a home made PCB using copper clad board 
 Since the main board doesn't have the CP2102 USB chip for programming interface and debugging, I used the Dev Kit and removed the ESP32 chip from it and interfaced as shown below. 
 
 ![alt text](debugg_interface.png)
+
+# MQTT Client Server Setup
+I used the station example from the ESP32 sdk folder. The station example allows us to connect to the wifi network. 
+
+# TO DO
+1. Once I was able to connect the module with the home network. In the station_example_main.c, please make sure to change the ssid and password as shown below.
+
+#define EXAMPLE_ESP_WIFI_SSID      "YOURSSID"//CONFIG_ESP_WIFI_SSID
+#define EXAMPLE_ESP_WIFI_PASS      "YOURPASSWORD" //CONFIG_ESP_WIFI_PASSWORD
+
+For MQTT reference code, I used SSL_mutual_auth which is the highest form of secure authentication 
+
+![alt text](mqtt_auth.png)
+
+# Setting up of TLS Certificate
+I used this weblink to create certificate. 
+
+http://www.steves-internet-guide.com/install-mosquitto-linux/
+
+http://www.steves-internet-guide.com/creating-and-using-client-certificates-with-mqtt-and-mosquitto/
+
+However, it was trcky to have it right, so I am detailing the exact step that I followed. 
+
+The first link explains the installations of mosquito and the second one eplains how to install the certificate for client and server.
+I used an UBUNTU PC as a server connected to my home LAN. 
+
+We create our own self signed CA and create client and server certificate using this CA. 
+
+
+Generate CA Key
+ **openssl genrsa -des3 -out ca.key 2048**
+	Enter PEM   dummy
+
+Keep note of the "dummy". We will need to use it later
+
+**openssl req -new -x509 -days 1826 -key ca.key -out ca.crt**
+*
+Enter pass phrase for ca.key:
+You are about to be asked to enter information that will be incorporated
+into your certificate request.
+What you are about to enter is what is called a Distinguished Name or a DN.
+There are quite a few fields but you can leave some blank
+For some fields there will be a default value,
+If you enter '.', the field will be left blank.
+-----
+Country Name (2 letter code) [AU]:US
+State or Province Name (full name) [Some-State]:CALIFORNIA
+Locality Name (eg, city) []:MILPITAS
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:IOT_Remainder
+Organizational Unit Name (eg, section) []:IOT_Remainder
+Common Name (e.g. server FQDN or YOUR name) []:SARATH
+Email Address []:
+*
+IMPORTANT: Not the common name given, in this case Sarath. Make sure it is the same name that we should use for all certificates
+
+Generate Server Key
+ **openssl genrsa -out server.key 2048**
+
+Generate Server CSR ( using server.key )
+ **2320  openssl req -new -out server.csr -key server.key**
+
+
+*Country Name (2 letter code) [AU]:US
+State or Province Name (full name) [Some-State]:CALIFORNIA
+Locality Name (eg, city) []:MILPITAS
+Organization Name (eg, company) [Internet Widgits Pty Ltd]:IOT_Remainder
+Organizational Unit Name (eg, section) []:ka
+Common Name (e.g. server FQDN or YOUR name) []:SARATH
+Email Address []:
+
+Please enter the following 'extra' attributes
+to be sent with your certificate request
+A challenge password []:
+An optional company name []:*
+
+Create a server certificate with CSR (  CA.cert  + CA.key  + server.csr )ok
+
+ **openssl x509 -req -in server.csr -CA ca.crt -CAkey ca.key -CAcreateserial -out server.crt -days 10000**
+
+Copy this certificate into the Ubuntu Server where MQTT is installed.
+   **sudo cp server.crt  /etc/mosquitto/certs/**
+   **sudo cp server.key  /etc/mosquitto/certs/**
+   **sudo cp ca.crt  /etc/mosquitto/certs/**
+
+
 
