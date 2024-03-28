@@ -55,10 +55,10 @@ After completing the layout , I created a home made PCB using copper clad board 
 
 // Insert Image
 
-# Programming and debugg interface 
+# Programming and debug interface 
 Since the main board doesn't have the CP2102 USB chip for programming interface and debugging, I used the Dev Kit and removed the ESP32 chip from it and interfaced as shown below. 
 
-![alt text](debugg_interface.png)
+![alt text](debug_interface.png)
 
 # MQTT Client Server Setup
 I used the station example from the ESP32 sdk folder. The station example allows us to connect to the wifi network. 
