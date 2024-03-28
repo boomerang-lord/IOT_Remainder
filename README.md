@@ -27,3 +27,4 @@ The device record user events and sends the time stamp to the server. The device
 
 Image testing
 ![alt text](<Screenshot 2024-03-27 at 7.11.48 PM.png>)
+<img src="/Users/sarathkamalkavitha/Desktop/Pictures/Diagram_MQTT.png " width="200">
