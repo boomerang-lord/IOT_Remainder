@@ -26,4 +26,4 @@ The IOT remainder is a general purpose remainder device where a user action need
 The device record user events and sends the time stamp to the server. The device also has ability to recieve messages from the server.  The events are stored in a time series database. Both the server and the device has the algorithm to learn the event schedule based on the usage pattern. 
 
 Image testing
-![alt text](wireless-robot-car-icon-outline-cute-toy-vector.jpg)
+![alt text](<Screenshot 2024-03-27 at 7.11.48 PM.png>)
